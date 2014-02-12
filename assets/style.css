@@ -1,0 +1,20 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 12.02.2014, 15:47:03
+    Author     : johannespichler
+*/
+
+#uuid_creator_container {
+    padding: 25px;
+}
+
+a.tl_submit.runner {
+    display: block;
+    clear: both;
+    margin: 25px;
+    padding: 15px;
+}

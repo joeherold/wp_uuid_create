@@ -1,0 +1,31 @@
+<div id="uuid_creator_container">
+<h2>UUID Creator</h2>
+<p>UUID Creator: if something went wrong with an update of Contao from a version prior 3.2 and now all e.g. images are gone, because wrong values are stored in the singleSRC and multiSRC Fields, this tool may fix it.</p>
+<p>I hope this will help somebody, who has got the same problem like I had.</p>
+<p>Cherio, <a href="http://www.webpixels.at" target="_blank" class="tl_green">Johannes Pichler - www.webpixels.at</a></p>
+<p class="tl_orange">
+    <strong>NOTE:</strong><br>This tool does not correct or even touch your tl_files table. Please verify, that your tl_files is up and has corrent UUID values in the fields <strong>tl_files.uuid</strong> and <strong>tl_files.pid</strong>.
+</p>
+<p class="tl_red">
+    <strong>IMPORTANT:</strong><br>Backup your database before you run this tool!
+</p>
+<?php if(!\Input::get('create')): ?>
+<br>
+
+<a id="runner_single_src" href="contao/main.php?do=uuid_creator&amp;create=singleSRC" class="tl_submit runner">run on fileTree Fields for <strong>single values</strong> (e.g. singleSRC)</a>
+
+<a id="runner_multi_src" href="contao/main.php?do=uuid_creator&amp;create=multiSRC" class="tl_submit runner">run on fileTree Fields for <strong>multiple values</strong> (e.g. multiSRC)</a>
+<?php else: ?>
+<a href="contao/main.php?do=uuid_creator" class="tl_submit runner">go back</a>
+<hr>
+<?php endif; ?>
+<?php if ($this->logStringErrors): ?>
+<div class="errors">
+    <?php echo $this->logStringErrors;?>
+</div>
+<?php endif; ?>
+
+<div class="log">
+    <?php echo ($this->logString);?>
+</div>
+</div>
