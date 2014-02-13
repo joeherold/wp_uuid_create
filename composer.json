@@ -33,9 +33,6 @@
 			"symlinks": {
 				"contao": "system/modules/wp_uuid_creator"
 			}
-		},
-		"branch-alias": {
-			"dev-master": "0.0.1-dev"
 		}
 	}
 }
