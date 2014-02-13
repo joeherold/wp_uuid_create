@@ -36,12 +36,12 @@
  * have to be set. Take a look at the system/modules/core/config/config.php
  * file to see how back end modules are configured.
  */
-array_insert($GLOBALS['BE_MOD'], 0, array('wp_uuid_creator' => array(
+array_insert($GLOBALS['BE_MOD'], 0, array('wp_uuid_create' => array(
         'uuid_creator' => array(
-            'icon' => 'system/modules/wp_uuid_creator/assets/uuid_creator.gif',
+            'icon' => 'system/modules/wp_uuid_create/assets/uuid_creator.gif',
             'callback' => 'UUIDCreatorClass',
-            'stylesheet'		=> 'system/modules/wp_uuid_creator/assets/style.css',
-            'javascript'    => 'system/modules/wp_uuid_creator/assets/uuid.js',
+            'stylesheet'		=> 'system/modules/wp_uuid_create/assets/style.css',
+            'javascript'    => 'system/modules/wp_uuid_create/assets/uuid.js',
         ),
 )));
 

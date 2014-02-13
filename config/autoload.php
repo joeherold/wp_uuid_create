@@ -26,8 +26,8 @@ ClassLoader::addNamespaces(array
 ClassLoader::addClasses(array
 (
 	// Classes
-	'UUIDCreator\UUIDCreatorClass' => 'system/modules/wp_uuid_creator/classes/UUIDCreatorClass.php',
-	'UUIDCreator\UUIDWorker'       => 'system/modules/wp_uuid_creator/classes/UUIDWorker.php',
+	'UUIDCreator\UUIDCreatorClass' => 'system/modules/wp_uuid_create/classes/UUIDCreatorClass.php',
+	'UUIDCreator\UUIDWorker'       => 'system/modules/wp_uuid_create/classes/UUIDWorker.php',
 ));
 
 
@@ -36,5 +36,5 @@ ClassLoader::addClasses(array
  */
 TemplateLoader::addFiles(array
 (
-	'be_uuid_creator' => 'system/modules/wp_uuid_creator/templates',
+	'be_uuid_creator' => 'system/modules/wp_uuid_create/templates',
 ));
