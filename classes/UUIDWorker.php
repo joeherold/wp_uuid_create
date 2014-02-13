@@ -25,79 +25,88 @@ class UUIDWorker extends \Contao\Controller {
     }
 
     public function run() {
-
+        
         $this->import('Database');
-        return $this->updateFileTreeFields();
+        
+        //repair the tl_files table
+        if ((\Input::get('repair') == 'tl_files')) {
+            return $this->repairFileSystemDatabase();
+        }
+        
+        //create uuids for the other tables
+        if ((\Input::get('create') != '')) {
+            return $this->updateFileTreeFields();
+        }
     }
 
     /**
      * Update all FileTree fields
      */
     public function updateFileTreeFields() {
-        if ((\Input::get('create') != '' )) {
-            $this->logString .= 'initated...';
-            $arrFiles = array();
+
+        $this->logString .= 'initated...';
+        $arrFiles = array();
 
 
-            foreach (scan(TL_ROOT . '/system/modules') as $strModule) {
-                $strDir = 'system/modules/' . $strModule . '/dca';
+        foreach (scan(TL_ROOT . '/system/modules') as $strModule) {
+            $strDir = 'system/modules/' . $strModule . '/dca';
 
-                if (!is_dir(TL_ROOT . '/' . $strDir)) {
-                    continue;
-                }
-
-                foreach (scan(TL_ROOT . '/' . $strDir) as $strFile) {
-                    // Ignore non PHP files and files which have been included before
-                    if (substr($strFile, -4) != '.php' || in_array($strFile, $arrFiles)) {
-                        continue;
-                    }
-
-                    $arrFiles[] = substr($strFile, 0, -4);
-                }
+            if (!is_dir(TL_ROOT . '/' . $strDir)) {
+                continue;
             }
 
-            $arrFields = array();
-
-            // Find all fileTree fields
-            foreach ($arrFiles as $strTable) {
-                try {
-                    $this->loadDataContainer($strTable);
-                } catch (\Exception $e) {
-                    $this->logStringErrors .= '<div class="tl_red">' . $e->getMessage() . '</div>';
+            foreach (scan(TL_ROOT . '/' . $strDir) as $strFile) {
+                // Ignore non PHP files and files which have been included before
+                if (substr($strFile, -4) != '.php' || in_array($strFile, $arrFiles)) {
                     continue;
                 }
 
-                $arrConfig = &$GLOBALS['TL_DCA'][$strTable]['config'];
+                $arrFiles[] = substr($strFile, 0, -4);
+            }
+        }
 
-                // Skip non-database DCAs
-                if ($arrConfig['dataContainer'] == 'File') {
-                    continue;
-                }
-                if ($arrConfig['dataContainer'] == 'Folder' && !$arrConfig['databaseAssisted']) {
-                    continue;
-                }
+        $arrFields = array();
 
-                // Make sure there are fields (see #6437)
-                if (is_array($GLOBALS['TL_DCA'][$strTable]['fields'])) {
-                    foreach ($GLOBALS['TL_DCA'][$strTable]['fields'] as $strField => $arrField) {
-                        // FIXME: support other field types
-                        if ($arrField['inputType'] == 'fileTree') {
-                            if ($this->Database->fieldExists($strField, $strTable, true)) {
-                                $key = $arrField['eval']['multiple'] ? 'multiple' : 'single';
-                                $arrFields[$key][] = $strTable . '.' . $strField;
-                            }
+        // Find all fileTree fields
+        foreach ($arrFiles as $strTable) {
+            try {
+                $this->loadDataContainer($strTable);
+            } catch (\Exception $e) {
+                $this->logStringErrors .= '<div class="tl_red">' . $e->getMessage() . '</div>';
+                continue;
+            }
 
-                            // Convert the order fields as well
-                            if (isset($arrField['eval']['orderField']) && isset($GLOBALS['TL_DCA'][$strTable]['fields'][$arrField['eval']['orderField']])) {
-                                if ($this->Database->fieldExists($arrField['eval']['orderField'], $strTable, true)) {
-                                    $arrFields['order'][] = $strTable . '.' . $arrField['eval']['orderField'];
-                                }
+            $arrConfig = &$GLOBALS['TL_DCA'][$strTable]['config'];
+
+            // Skip non-database DCAs
+            if ($arrConfig['dataContainer'] == 'File') {
+                continue;
+            }
+            if ($arrConfig['dataContainer'] == 'Folder' && !$arrConfig['databaseAssisted']) {
+                continue;
+            }
+
+            // Make sure there are fields (see #6437)
+            if (is_array($GLOBALS['TL_DCA'][$strTable]['fields'])) {
+                foreach ($GLOBALS['TL_DCA'][$strTable]['fields'] as $strField => $arrField) {
+                    // FIXME: support other field types
+                    if ($arrField['inputType'] == 'fileTree') {
+                        if ($this->Database->fieldExists($strField, $strTable, true)) {
+                            $key = $arrField['eval']['multiple'] ? 'multiple' : 'single';
+                            $arrFields[$key][] = $strTable . '.' . $strField;
+                        }
+
+                        // Convert the order fields as well
+                        if (isset($arrField['eval']['orderField']) && isset($GLOBALS['TL_DCA'][$strTable]['fields'][$arrField['eval']['orderField']])) {
+                            if ($this->Database->fieldExists($arrField['eval']['orderField'], $strTable, true)) {
+                                $arrFields['order'][] = $strTable . '.' . $arrField['eval']['orderField'];
                             }
                         }
                     }
                 }
             }
         }
+
 
         // Update the existing singleSRC entries
         if (isset($arrFields['single']) && (\Input::get('create') == 'singleSRC')) {
@@ -118,10 +127,8 @@ class UUIDWorker extends \Contao\Controller {
             }
         }
 
-        
-        if ((\Input::get('repair') == 'tl_files')) {
-            $this->repairFileSystemDatabase();
-        }
+
+
 
         return true;
     }
@@ -194,6 +201,7 @@ class UUIDWorker extends \Contao\Controller {
             // Drop the pid_backup column
             $this->Database->query("ALTER TABLE `tl_files` DROP `pid_backup`");
         }
+        return true;
     }
 
     /**
