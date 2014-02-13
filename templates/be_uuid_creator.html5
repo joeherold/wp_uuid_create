@@ -11,7 +11,7 @@
     <?php if (!\Input::get('create')): ?>
         <br>
 
-        <a id="runner_single_src" href="contao/main.php?do=uuid_creator&amp;repair=tl_files" class="tl_submit runner">try to repair tl_files (if needed)</a>
+        <a id="runner_file_repair" href="contao/main.php?do=uuid_creator&amp;repair=tl_files" class="tl_submit runner">try to repair tl_files (if needed)</a>
 
         <a id="runner_single_src" href="contao/main.php?do=uuid_creator&amp;create=singleSRC" class="tl_submit runner">run on fileTree Fields for <strong>single values</strong> (e.g. singleSRC)</a>
 

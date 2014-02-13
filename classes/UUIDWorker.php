@@ -30,12 +30,12 @@ class UUIDWorker extends \Contao\Controller {
         
         //repair the tl_files table
         if ((\Input::get('repair') == 'tl_files')) {
-            return $this->repairFileSystemDatabase();
+            $this->repairFileSystemDatabase();
         }
         
         //create uuids for the other tables
         if ((\Input::get('create') != '')) {
-            return $this->updateFileTreeFields();
+            $this->updateFileTreeFields();
         }
     }
 
@@ -110,7 +110,7 @@ class UUIDWorker extends \Contao\Controller {
 
         // Update the existing singleSRC entries
         if (isset($arrFields['single']) && (\Input::get('create') == 'singleSRC')) {
-            $this->logString = '<h3>SINGLE SRC</h3>';
+            $this->logString .= '<h3>SINGLE SRC</h3>';
             foreach ($arrFields['single'] as $val) {
                 list($table, $field) = explode('.', $val);
 
@@ -120,7 +120,7 @@ class UUIDWorker extends \Contao\Controller {
 
         // Update the existing multiSRC entries
         if (isset($arrFields['multiple']) && (\Input::get('create') == 'multiSRC')) {
-            $this->logString = '<h3>MULTI SRC</h3>';
+            $this->logString .= '<h3>MULTI SRC</h3>';
             foreach ($arrFields['multiple'] as $val) {
                 list($table, $field) = explode('.', $val);
                 $this->convertMultiField($table, $field);
@@ -135,7 +135,7 @@ class UUIDWorker extends \Contao\Controller {
 
     public function repairFileSystemDatabase() {
         // Check whether there are UUIDs
-        if (!$this->Database->fieldExists('uuid', 'tl_files')) {
+        
             try {
                 if (!$this->Database->fieldExists('uuid', 'tl_files')) {
                     // Adjust the DB structure
@@ -200,7 +200,7 @@ class UUIDWorker extends \Contao\Controller {
 
             // Drop the pid_backup column
             $this->Database->query("ALTER TABLE `tl_files` DROP `pid_backup`");
-        }
+        
         return true;
     }
 

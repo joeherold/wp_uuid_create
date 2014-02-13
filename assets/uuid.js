@@ -17,4 +17,8 @@ window.addEvent('domready', function() {
     $$('#runner_multi_src').addEvent('click', function(event) {
         alert('Bare in mind, this may take a while...');
     });
+    $$('#runner_file_repair').addEvent('click', function(event) {
+        alert('Bare in mind, this may take a while...');
+    });
+    
 });
