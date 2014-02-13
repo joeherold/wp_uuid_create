@@ -197,7 +197,7 @@ class UUIDWorker extends \Contao\Controller {
                 if ($objParent->numRows < 1) {
 
                     //$this->logStringErrors .= '<div class="tl_red">' . $e->getMessage() . '</div>';
-                    $this->logString .= '<br><strong class="tl_red">Invalid parent ID ' . $objFiles->pid_backup . '</strong>';
+                    //$this->logString .= '<br><strong class="tl_red">Invalid parent ID ' . $objFiles->pid_backup . '</strong>';
                     $this->Database->prepare("UPDATE tl_files SET pid=NULL WHERE uuid=?")
                             ->execute($objFiles->uuid);
                 } else {
@@ -212,7 +212,7 @@ class UUIDWorker extends \Contao\Controller {
 
         // Drop the pid_backup column
         $this->Database->query("ALTER TABLE `tl_files` DROP `pid_backup`");
-
+        $this->logString .= '<br><strong class="tl_green">DONE</strong>';
         return true;
     }
 
