@@ -37,7 +37,7 @@
                             "templates": "system/modules/wp_uuid_creator/templates",
                             "README.md": "system/modules/wp_uuid_creator/README.md",
                             "composer.json": "system/modules/wp_uuid_creator/composer.json"
-                            } 
+                            }
 		}
 	}
 }
