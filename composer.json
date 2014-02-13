@@ -25,7 +25,7 @@
 	},
 	"autoload":{
 		"psr-0":{
-			"wp_uuid_creator": "src/"
+			"wp_uuid_creator": ""
 		}
 	},
 	"extra": {
