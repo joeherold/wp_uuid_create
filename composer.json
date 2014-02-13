@@ -39,5 +39,5 @@
                             "composer.json": "system/modules/wp_uuid_create/composer.json"
                             }
 		}
-	}
+	} 
 }
