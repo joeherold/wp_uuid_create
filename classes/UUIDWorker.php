@@ -256,9 +256,13 @@ class UUIDWorker extends \Contao\Controller {
                     $objFile = \FilesModel::findById(intval($objRow->$field));
                     if ($objFile) {
                         try {
-                            $objDatabase->prepare("UPDATE $table SET $field=? WHERE id=?")
-                                    ->execute($objFile->uuid, $objRow->id);
-                            $this->logString .= '<br>- Record with id <strong class="tl_green">' . $objRow->id . '</strong> updated.';
+                            if ($objFile->uuid) {
+                                $objDatabase->prepare("UPDATE $table SET $field=? WHERE id=?")
+                                        ->execute($objFile->uuid, $objRow->id);
+                                $this->logString .= '<br>- Record with id <strong class="tl_green">' . $objRow->id . '</strong> updated.';
+                            } else {
+                                $this->logString .= '<br><strong class="tl_red">ERROR entry in tl_files has no UUIDs! please repare tl_files before.</strong>';
+                            }
                         } catch (\Exception $e) {
                             $this->logStringErrors .= '<div class="tl_red">' . $e->getMessage() . '</div>';
                             $this->logString .= '<br><strong class="tl_red">ERROR on updating with new UUID value</strong>';
@@ -321,7 +325,11 @@ class UUIDWorker extends \Contao\Controller {
                         $found +=1;
                         $objFile = \FilesModel::findByPk(intval($v));
                         if ($objFile) {
-                            $arrPaths[$k] = $objFile->uuid;
+                            if($objFile->uuid){
+                                $arrPaths[$k] = $objFile->uuid;
+                            } else {
+                                $this->logString .= '<br><strong class="tl_red">ERROR entry in tl_files has no UUIDs! please repare tl_files before.</strong>';
+                            }
                         } else {
                             $this->logString .= '<br>Can not find any File in tl_files according to given ID';
                         }
