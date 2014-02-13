@@ -31,7 +31,7 @@
 	"extra": {
 		"contao": {
 			"sources": {
-                            "src": "system/modules/wp_uuid_create"
+                            "wp_uuid_create": "system/modules/wp_uuid_create"
                             }
 		}
 	}
