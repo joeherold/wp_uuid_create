@@ -31,7 +31,13 @@
 	"extra": {
 		"contao": {
 			"sources": {
-                            "src": "system/modules/wp_uuid_create"
+                            "assets": "system/modules/wp_uuid_create/assets",
+                            "classes": "system/modules/wp_uuid_create/classes",
+                            "config": "system/modules/wp_uuid_create/config",
+                            "languages": "system/modules/wp_uuid_create/languages",
+                            "templates": "system/modules/wp_uuid_create/templates",
+                            "README.md": "system/modules/wp_uuid_create/README.md",
+                            "composer.json": "system/modules/wp_uuid_create/composer.json"
                             }
 		}
 	}
