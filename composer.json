@@ -21,12 +21,12 @@
 	},
 	"require":{
 		"php":">=5.3",
-		"contao/core": ">=3.2"		
+		"contao/core": ">=3.2",
+                "contao-community-alliance/composer-installer": "*"
+		
 	},
-	"autoload":{
-		"psr-0":{
-			"wp_uuid_creator": "/"
-		}
+        "replace":{
+		"contao-legacy/wp_uuid_create":"*"
 	},
 	"extra": {
 		"contao": {
