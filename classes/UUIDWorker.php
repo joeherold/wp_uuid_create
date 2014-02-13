@@ -118,6 +118,7 @@ class UUIDWorker extends \Contao\Controller {
             }
         }
 
+        
         if ((\Input::get('repair') == 'tl_files')) {
             $this->repairFileSystemDatabase();
         }
