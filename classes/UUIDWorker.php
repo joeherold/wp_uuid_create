@@ -25,14 +25,14 @@ class UUIDWorker extends \Contao\Controller {
     }
 
     public function run() {
-        
+
         $this->import('Database');
-        
+
         //repair the tl_files table
         if ((\Input::get('repair') == 'tl_files')) {
             $this->repairFileSystemDatabase();
         }
-        
+
         //create uuids for the other tables
         if ((\Input::get('create') != '')) {
             $this->updateFileTreeFields();
@@ -135,72 +135,84 @@ class UUIDWorker extends \Contao\Controller {
 
     public function repairFileSystemDatabase() {
         // Check whether there are UUIDs
-        
-            try {
-                if (!$this->Database->fieldExists('uuid', 'tl_files')) {
-                    // Adjust the DB structure
-                    $this->Database->query("ALTER TABLE `tl_files` ADD `uuid` binary(16) NULL");
-                    $this->Database->query("ALTER TABLE `tl_files` ADD UNIQUE KEY `uuid` (`uuid`)");
-                }
-            } catch (\Exception $e) {
-                $this->logStringErrors .= '<div class="tl_red">' . $e->getMessage() . '</div>';
-                $this->logString .= '<br><strong class="tl_red">ERROR on updating with new UUID value</strong>';
+
+        try {
+            if (!$this->Database->fieldExists('uuid', 'tl_files')) {
+                // Adjust the DB structure
+                $this->Database->query("ALTER TABLE `tl_files` ADD `uuid` binary(16) NULL");
+                $this->Database->query("ALTER TABLE `tl_files` ADD UNIQUE KEY `uuid` (`uuid`)");
             }
+        } catch (\Exception $e) {
+            $this->logStringErrors .= '<div class="tl_red">' . $e->getMessage() . '</div>';
+            $this->logString .= '<br><strong class="tl_red">ERROR on updating with new UUID value</strong>';
+        }
 
-            try {
-                if (!$this->Database->fieldExists('pid_backup', 'tl_files')) {
-                    // Backup the pid column and change the column type
-                    $this->Database->query("ALTER TABLE `tl_files` ADD `pid_backup` int(10) unsigned NOT NULL default '0'");
-                    $this->Database->query("UPDATE `tl_files` SET `pid_backup`=`pid`");
-                    $this->Database->query("ALTER TABLE `tl_files` CHANGE `pid` `pid` binary(16) NULL");
-                    $this->Database->query("UPDATE `tl_files` SET `pid`=NULL");
-                    $this->Database->query("UPDATE `tl_files` SET `pid`=NULL WHERE `pid_backup`=0");
-                }
-            } catch (\Exception $e) {
-                $this->logStringErrors .= '<div class="tl_red">' . $e->getMessage() . '</div>';
-                $this->logString .= '<br><strong class="tl_red">ERROR on creating tl_files.pid_backup an setting values</strong>';
+        try {
+            if (!$this->Database->fieldExists('pid_backup', 'tl_files')) {
+                // Backup the pid column and change the column type
+                $this->Database->query("ALTER TABLE `tl_files` ADD `pid_backup` int(10) unsigned NOT NULL default '0'");
+                $this->Database->query("UPDATE `tl_files` SET `pid_backup`=`pid`");
+                $this->Database->query("ALTER TABLE `tl_files` CHANGE `pid` `pid` binary(16) NULL");
+                //$this->Database->query("UPDATE `tl_files` SET `pid`=NULL");
+                //$this->Database->query("UPDATE `tl_files` SET `pid`=NULL WHERE `pid_backup`=0");
             }
+        } catch (\Exception $e) {
+            $this->logStringErrors .= '<div class="tl_red">' . $e->getMessage() . '</div>';
+            $this->logString .= '<br><strong class="tl_red">ERROR on creating tl_files.pid_backup an setting values</strong>';
+        }
 
-            /*
-             * first we will create all UUIDs in tl_files.uuid
-             */
-            $objFiles = $this->Database->query("SELECT id FROM tl_files");
+        /*
+         * first we will create all UUIDs in tl_files.uuid
+         */
+        $objFiles = $this->Database->query("SELECT id,uuid FROM tl_files");
 
-            // Generate the UUIDs
-            while ($objFiles->next()) {
+        // Generate the UUIDs
+
+        while ($objFiles->next()) {
+            if ((!$objFiles->uuid)) {
                 $this->Database->prepare("UPDATE tl_files SET uuid=? WHERE id=?")
                         ->execute($this->Database->getUuid(), $objFiles->id);
             }
+        }
 
-            $objFiles = $this->Database->query("SELECT pid_backup FROM tl_files WHERE pid_backup>0 GROUP BY pid_backup");
+        $objFiles = $this->Database->query("SELECT id,uuid,path FROM tl_files");
 
 
-            /*
-             * next we will create all pid.UUIDs in tl_files.pid
-             */
-            // Adjust the parent IDs
-            while ($objFiles->next()) {
-                if (($objFiles->pid_backup) > 0) {
-                    $objParent = $this->Database->prepare("SELECT uuid FROM tl_files WHERE id=?")
-                            ->execute($objFiles->pid_backup);
+        /*
+         * next we will create all pid.UUIDs in tl_files.pid
+         */
+        // Adjust the parent IDs
+        while ($objFiles->next()) {
+            if (($objFiles->path)) {
+                $pathArr = explode('/', $objFiles->path);
+                $lastElement = array_pop($pathArr);
+                if ($lastElement) {
+                    $newPath = implode('/', $pathArr);
+                } else {
+                    $newPath = '';
+                }
+                $objParent = $this->Database->prepare("SELECT uuid FROM tl_files WHERE path=?")
+                        ->execute($newPath);
 
-                    if ($objParent->numRows < 1) {
+                if ($objParent->numRows < 1) {
 
-                        $this->logStringErrors .= '<div class="tl_red">' . $e->getMessage() . '</div>';
-                        $this->logString .= '<br><strong class="tl_red">Invalid parent ID ' . $objFiles->pid_backup . '</strong>';
-                        continue;
-                    }
+                    //$this->logStringErrors .= '<div class="tl_red">' . $e->getMessage() . '</div>';
+                    $this->logString .= '<br><strong class="tl_red">Invalid parent ID ' . $objFiles->pid_backup . '</strong>';
+                    $this->Database->prepare("UPDATE tl_files SET pid=NULL WHERE uuid=?")
+                            ->execute($objFiles->uuid);
+                } else {
 
-                    $this->Database->prepare("UPDATE tl_files SET pid=? WHERE pid_backup=?")
-                            ->execute($objParent->uuid, $objFiles->pid_backup);
+                    $this->Database->prepare("UPDATE tl_files SET pid=? WHERE uuid=?")
+                            ->execute($objParent->uuid, $objFiles->uuid);
                 }
             }
+        }
 
 
 
-            // Drop the pid_backup column
-            $this->Database->query("ALTER TABLE `tl_files` DROP `pid_backup`");
-        
+        // Drop the pid_backup column
+        $this->Database->query("ALTER TABLE `tl_files` DROP `pid_backup`");
+
         return true;
     }
 
