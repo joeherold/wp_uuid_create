@@ -6,5 +6,6 @@ UUID Creator: if something went wrong with an update of Contao from a version pr
 I hope this will help somebody, who has got the same problem like I had.
 
 Cherio, Johannes Pichler
+
 NOTE: it does not correct any errors on the tl_page table
 IMPORTANT: make a backup of your database before 
