@@ -1,5 +1,5 @@
 {
-	"name":"webpixels/contao-wp_uuid_creator",
+	"name":"webpixels/contao-wp_uuid_create",
 	"description":"Create UUIDs and repair tl_files if update from prior 3.2 went wrong for contao",
 	"keywords":["uuid", "contao", "update", "tool"],
 	"type":"contao-module",
