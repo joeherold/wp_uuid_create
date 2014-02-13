@@ -30,13 +30,13 @@
 	"extra": {
 		"contao": {
 			"sources": {
-                            "assets": "system/modules/wp_uuid_create/assets",
-                            "classes": "system/modules/wp_uuid_create/classes",
-                            "config": "system/modules/wp_uuid_create/config",
-                            "languages": "system/modules/wp_uuid_create/languages",
-                            "templates": "system/modules/wp_uuid_create/templates",
-                            "README.md": "system/modules/wp_uuid_create/README.md",
-                            "composer.json": "system/modules/wp_uuid_create/composer.json"
+                            "assets": "system/modules/wp_uuid_creator/assets",
+                            "classes": "system/modules/wp_uuid_creator/classes",
+                            "config": "system/modules/wp_uuid_creator/config",
+                            "languages": "system/modules/wp_uuid_creator/languages",
+                            "templates": "system/modules/wp_uuid_creator/templates",
+                            "README.md": "system/modules/wp_uuid_creator/README.md",
+                            "composer.json": "system/modules/wp_uuid_creator/composer.json"
                             }
 		}
 	}
