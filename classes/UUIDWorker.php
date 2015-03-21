@@ -11,6 +11,7 @@
  * on these fields only.
  *
  * @author johannespichler
+ * @author Monique Hahnefeld
  */
 
 namespace UUIDCreator;
@@ -298,6 +299,9 @@ class UUIDWorker extends \Contao\Controller {
             try {
                 $objDatabase->query("ALTER TABLE `$table` ADD `$backup` blob NULL");
                 $this->logString .= '<br>Field: <strong>' . $backup . '</strong> <span class="tl_green">added</span>.';
+                 if ($objDatabase->query("UPDATE `$table` SET `$backup` = '_'")) {
+                 $this->logString .= '<br>...Field ' . $backup . ' prepared.';           
+                }
                 $objDatabase->query("ALTER TABLE `$table` CHANGE `$field` `$field` blob NULL");
                 $this->logString .= '<br>Field: <strong>' . $field . '</strong> <span class="tl_blue">converted</span> to blob.';
             } catch (\Exception $e) {
@@ -305,16 +309,18 @@ class UUIDWorker extends \Contao\Controller {
                 $this->logString .= '<br><strong class="tl_red">ERROR on creating backup table-field and field conversion to blob...</strong>';
             }
         }
-        if ($objDatabase->query("UPDATE `$table` SET `$backup` = '_'")) {
-            $this->logString .= '<br>...Field ' . $backup . ' prepared.';
-        }
 
-        $objRow = $objDatabase->query("SELECT id, $field, $backup FROM $table WHERE $backup!=''");
+        $objRow = $objDatabase->query("SELECT id, $field, $backup FROM $table WHERE $backup='_'");
         $found = 0;
         if ($objRow) {
             while ($objRow->next()) {
-                $arrPaths = deserialize($objRow->$backup, true);
-
+                //set here the field value to the backupfield
+                $objDatabase->prepare("UPDATE $table SET $backup=? WHERE id=?")
+                                ->execute($objRow->$field, $objRow->id);
+                        $this->logString .= '<br>- Field '.$field.' is now backuped (Record: id <strong class="tl_green">' . $objRow->id . '</strong>).';
+       
+                $arrPaths = deserialize($objRow->$field, true);
+                        
                 if (empty($arrPaths)) {
                     continue;
                 }
@@ -327,6 +333,7 @@ class UUIDWorker extends \Contao\Controller {
                         if ($objFile) {
                             if($objFile->uuid){
                                 $arrPaths[$k] = $objFile->uuid;
+                         
                             } else {
                                 $this->logString .= '<br><strong class="tl_red">ERROR entry in tl_files has no UUIDs! please repare tl_files before.</strong>';
                             }
@@ -347,8 +354,9 @@ class UUIDWorker extends \Contao\Controller {
                 }
             }
         }
-        $objDatabase->query("ALTER TABLE `$table` DROP `$backup` ");
-        $this->logString .= '<br>Field: <strong>' . $backup . '</strong> <span class="tl_red">removed</span>.';
+        //$objDatabase->query("ALTER TABLE `$table` DROP `$backup` ");
+       // $this->logString .= '<br>Field: <strong>' . $backup . '</strong> <span class="tl_red">removed</span>.';
+        $this->logString .= '<br><strong class="tl_green">Got ist ALL? If all is fine update your database.</strong>';
     }
 
 }
