@@ -9,3 +9,5 @@ Cherio, Johannes Pichler
 
 NOTE: it does not correct any errors on the tl_page table
 IMPORTANT: make a backup of your database before 
+
+Thanks to Monique Hahnefeld for fixing multiSRC bug.
